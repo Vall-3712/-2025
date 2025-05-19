@@ -5,7 +5,7 @@ import math
 #Автомат выбора шага
 
 P0 = 101325.0
-Temperatore_changeble = 2000.0
+Temperatore_changeble = 800.0
 temperature_normal = 298.15
 k1 =  (6 * (10 ** 13) / (1000 ** 0.5)) * (2.7182 ** (- 164541.24 / 8.3144 / Temperatore_changeble))  #4820.5
 R = 8.3144
@@ -16,7 +16,7 @@ X_N2 = 0.11425
 X_H2O = 0.49278
 
 M_H2 = 0.002015
-M_N2 = 0.0028013
+M_N2 = 0.028013
 M_O2 = 0.031999
 M_H2O = 0.018015
 
@@ -192,7 +192,7 @@ def runge_kutta_system(k1, gamma_h2, gamma_o2, gamma_h2o, gamma_n2, h, N, output
                 h = h * 0.010
         if (i > 10000) and (h2o[i-1] != 0):
             if (current_h2o / h2o[i-1] < 1.001):
-                h =  h * 1.001
+                h =  h * 1.0001
         if h > h_begin * 0.4:
                 h = h_begin * 0.4
         
@@ -320,7 +320,7 @@ def runge_kutta_system(k1, gamma_h2, gamma_o2, gamma_h2o, gamma_n2, h, N, output
             H_O2_N = H_termodinamic(DH_O2, TK, temperature_normal, F1_O2, F2_O2, F3_O2, F4_O2, F5_O2, F6_O2)
             H_H2O_N = H_termodinamic(DH_H2O, TK, temperature_normal, F1_H2O, F2_H2O, F3_H2O, F4_H2O, F5_H2O, F6_H2O)
             #FT = calc_FT(gamma_h2_newton, gamma_o2_newton, gamma_o2_newton, DH_H2, DH_O2, DH_H2O, TK, temperature_normal, F1_H2, F2_H2, F3_H2, F4_H2, F5_H2, F6_H2, F1_O2, F2_O2, F3_O2, F4_O2, F5_O2, F6_O2, F1_H2O, F2_H2O, F3_H2O, F4_H2O, F5_H2O, F6_H2O)
-            FT = (gamma_h2_newton * H_H2_N + gamma_o2_newton * H_O2_N + gamma_h2o_newton * H_H2O_N) - 4291923.9052 #H_sum_begin
+            FT = (gamma_h2_newton * H_H2_N + gamma_o2_newton * H_O2_N + gamma_h2o_newton * H_H2O_N) - 746052.6104 #H_sum_begin
             CP_H2_N = Cp_termodinamic(TK, F1_H2, F2_H2, F3_H2, F4_H2, F5_H2, F6_H2)
             CP_O2_N = Cp_termodinamic(TK, F1_O2, F2_O2, F3_O2, F4_O2, F5_O2, F6_O2)
             CP_H2O_N = Cp_termodinamic(TK, F1_H2O, F2_H2O, F3_H2O, F4_H2O, F5_H2O, F6_H2O)
@@ -339,7 +339,7 @@ def runge_kutta_system(k1, gamma_h2, gamma_o2, gamma_h2o, gamma_n2, h, N, output
             gam_n2[i+1] = cur_n2_gamma
 
         
-        if i % 1 == 0:
+        if i % 50 == 0:
             output_file.write(f'{i:<10} {current_time:<10.7f} {temperature[i]:<13.2f} {H_sum:<13.4f} {current_h2:<13.10f} {current_o2:<13.10f} {current_h2o:<13.10f} {H_H2:<13.4f} {H_O2:<13.4f} {H_H2O:<13.4f} {CP_H2:<13.4f} {CP_O2:<13.4f} {CP_H2O:<13.4f} {S_H2:<13.4f} {S_O2:<13.4f} {S_H2O:<13.4f} {cur_h2_gamma:<10.5f} {cur_o2_gamma:<10.5f} {cur_h2o_gamma:<10.5f} {Wi_H2:<15.4f} {Wi_O2:<15.4f} {Wi_H2O:<15.4f} {Si_H2:<13.4f} {Si_O2:<13.4f} {Si_H2O:<13.4f} {G_H2:<13.1f} {G_O2:<13.1f} {G_H2O:<13.1f} {k1:<15.4f} {k_opposit:<13.20f} {Cp_sum:<13.4f} {W4}\n')
             #output_file.write(f'{temperature[i]:<13.2f}\n')
             print(f'{i:<10} {current_time:<10.7f} {current_h2:<13.10f} {current_o2:<13.10f} {current_h2o:<13.10f}')
@@ -348,16 +348,16 @@ def runge_kutta_system(k1, gamma_h2, gamma_o2, gamma_h2o, gamma_n2, h, N, output
     
 # Конец объявления функций, начало программы
 
-h = 1e-11 * 0.5
+h = 1e-8 * 0.5
 h_begin = h
-N = 2120
-output = open('out2000-H2O+N2.txt', 'w')
+N = 173800
+output = open('out800-H2O+N2.txt', 'w')
 
 M = M_sum(X_H2, M_H2, X_O2, M_O2, X_H2O, M_H2O, X_N2, M_N2)
 Gamma_H2, Gamma_O2, Gamma_H2O, Gamma_N2 = Moll_Mass(X_H2, X_O2, X_H2O, X_N2)
 p = density(P0, Temperatore_changeble, Gamma_H2, Gamma_O2, Gamma_H2O, Gamma_N2)
 
-t, H2, H2O, O2, N2, Temperature = runge_kutta_system(k1, Gamma_H2, Gamma_O2, Gamma_H2O, Gamma_N2, h, N, output)
+t, H2, O2, H2O, N2, Temperature = runge_kutta_system(k1, Gamma_H2, Gamma_O2, Gamma_H2O, Gamma_N2, h, N, output)
 
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 axs[0].plot(t, H2, label='$H_2$')
